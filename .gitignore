@@ -1,0 +1,4 @@
+db
+*.feather
+server/package-lock.json
+server/node_modules
