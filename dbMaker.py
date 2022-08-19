@@ -108,7 +108,7 @@ if __name__=='__main__':
     print('Spearman...')
     
     # Single thread
-    # result = [SpearmanCalc(i,args) for i in dfd.items()]
+    result = [SpearmanCalc(i,args) for i in dfd.items()]
     
     # Multi-thread
     with Pool(processes=args['nthreads']) as pool:
@@ -133,14 +133,15 @@ if __name__=='__main__':
     # Generate json with q bands information
     # For each q in T, indicate PSMs and scores along their bands
     
+    gene2prot = dict(list(set(list(zip(df['Gene'].to_list(), df['protein'].to_list())))))
     
     dfd_bands = [[i, dfd_out[i]['freq']['count'].transpose().to_dict(), dfd_out[i]['freq'][args['sc']].transpose().to_dict()] for i in dfd_out]
-    
+        
     dfd_bands_out = [ 
       [
        tissue, 
-       [{'gene': i, 'PSMs': list(dfc[i].values()), 'bands':list(dfc[i].keys()), 'tissue':tissue, 'organism': args['organism']} for i in dfc], #loop each gene
-       [{'gene': i, 'score': list(dfc[i].values()), 'bands':list(dfc[i].keys()), 'tissue':tissue, 'organism': args['organism']} for i in dfs] #loop each gene
+       [{'gene': i, 'protein':gene2prot[i], 'PSMs': list(dfc[i].values()), 'bands':list(dfc[i].keys()), 'tissue':tissue, 'organism': args['organism']} for i in dfc], #loop each gene
+       [{'gene': i, 'protein':gene2prot[i], 'score': list(dfc[i].values()), 'bands':list(dfc[i].keys()), 'tissue':tissue, 'organism': args['organism']} for i in dfs] #loop each gene
        ]
       for tissue, dfc, dfs in dfd_bands 
       ]
