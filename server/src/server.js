@@ -5,8 +5,6 @@ const cors = require('cors');
 const path = require('path');
 const mongoose = require('mongoose');
 
-console.log(path.dirname(require.main.filename));
-
 // Declare instances and server configuration
 const app = express();
 const port = 5000;

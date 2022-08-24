@@ -23,7 +23,6 @@ Retrieve the proteins report
 */
 router.get('/proteins', async (req, res, next) => {
     // get queries
-    res.send(req.body);
     let params = req.query;
     // return all proteins from several species
     if ( 'species' in params ) {
@@ -58,8 +57,9 @@ router.get('/samples', async (req, res, next) => {
 });
 
 /*
-Retrieve the complexes based on a list of species
+Retrieve the complexes based on a list of species (Still not defined)
 */
+/*
 router.get('/complexes', function (req, res, next) {
     // get queries
     let params = req.query;
@@ -74,6 +74,7 @@ router.get('/complexes', function (req, res, next) {
         res.status(404).send('Complexes not found');
     }
 });
+*/
 
 /*
 Get correlations from gene
@@ -83,10 +84,10 @@ router.get('/correlations', async (req, res, next) => {
 
     let g = 'gene' in params ? params.gene.split(/[, ]+/).filter(Boolean) : []; // split by ',' discarding the spaces between them
     
-    let s = 'specie' in req.params ? params.specie.split(/[, ]+/).filter(Boolean) : 
+    let s = 'specie' in params ? params.specie.split(/[, ]+/).filter(Boolean) : 
         await myQueries.getSpecies();
 
-    let t = 'tissue' in req.params ? params.tissue.split(/[, ]+/).filter(Boolean) : 
+    let t = 'tissue' in params ? params.tissue.split(/[, ]+/).filter(Boolean) : 
         [].concat.apply([], Object.values(await myQueries.getSamples(s)));;
     
     if ( g.length > 0 ) {
@@ -107,10 +108,10 @@ router.get('/scounts', async (req, res, next) => {
     
     let g = 'gene' in params ? params.gene.split(/[, ]+/).filter(Boolean) : []; // split by ',' discarding the spaces between them
     if ( g.length>0 ) {
-        let s = 'specie' in req.params ? params.specie.split(/[, ]+/).filter(Boolean) : 
+        let s = 'specie' in params ? params.specie.split(/[, ]+/).filter(Boolean) : 
             await myQueries.getSpecies();
         
-        let t = 'tissue' in req.params ? params.tissue.split(/[, ]+/).filter(Boolean) : 
+        let t = 'tissue' in params ? params.tissue.split(/[, ]+/).filter(Boolean) : 
             [].concat.apply([], Object.values(await myQueries.getSamples(s)));;
 
         let scounts = await myQueries.getSCounts(g, s, t);
