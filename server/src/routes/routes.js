@@ -87,7 +87,7 @@ router.get('/correlations', async (req, res, next) => {
     let s = 'specie' in params ? params.specie.split(/[, ]+/).filter(Boolean) : 
         await myQueries.getSpecies();
 
-    let t = 'tissue' in params ? params.tissue.split(/[, ]+/).filter(Boolean) : 
+    let t = 'tissue' in params && params.tissue!='' ? params.tissue.split(/[, ]+/).filter(Boolean) : 
         [].concat.apply([], Object.values(await myQueries.getSamples(s)));;
     
     if ( g.length > 0 ) {

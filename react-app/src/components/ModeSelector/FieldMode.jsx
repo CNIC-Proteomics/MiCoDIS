@@ -9,7 +9,7 @@ function FieldMode(props) {
   return (
     <Card 
         id={props.id}
-        className={props.mode==props.id ? modeStyle[0] : modeStyle[1]} 
+        className={props.mode===props.id ? modeStyle[0] : modeStyle[1]} 
         style={commonStyle}
         onClick={props.handleClick}
     >

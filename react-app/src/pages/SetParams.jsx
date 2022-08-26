@@ -2,53 +2,38 @@ import { Button } from '@mui/material';
 import React from 'react'
 import { useEffect, useState } from 'react';
 import ModeSelector from '../components/ModeSelector/ModeSelector'
-import ProteinForm from '../components/ProteinForm'
+import ProteinForm from '../components/ModeSelector/ProteinForm'
 import SendIcon from '@mui/icons-material/Send';
+import { useNavigate } from 'react-router-dom';
+
+import getData from '../lib/getData';
 
 function SetParams() {
 
     const [geneData, setGeneData] = useState();
     const [sampleData, setSampleData] = useState();
 
-    const [ mode, setMode ] = useState('score');
+    const [ mode, setMode ] = useState('correlations');
     const [specie, setSpecie] = useState();
     const [samples, setSamples] = useState([]);
     const [genes, setGenes] = useState([]);
 
-    const getData = async () => {
-
-        let preGeneData = localStorage.getItem('geneData');
-        if(!preGeneData) {
-            const resProteins = await fetch(`${process.env.REACT_APP_SERVER}/proteins`);
-            preGeneData = await resProteins.json();
-            localStorage.setItem('geneData', JSON.stringify(preGeneData));
-        } 
-        else {
-            preGeneData = JSON.parse(preGeneData);
-        }
-        setGeneData(preGeneData);
-
-        let preSampleData = localStorage.getItem('samples');
-        if (!preSampleData) {
-            const resSample = await fetch(`${process.env.REACT_APP_SERVER}/samples`);
-            preSampleData = await resSample.json();            
-            localStorage.setItem('sampleData', JSON.stringify(preSampleData));
-            
-        }
-        else {
-            preSampleData = JSON.parse(preSampleData);
-        }
-        setSampleData(preSampleData);
-        setSpecie(Object.keys(preSampleData)[0]);
-    }
+    const [geneError, setGeneError] = useState(false);
+    const navigate = useNavigate();
 
     useEffect( () => {
-        getData();
+        getData(setGeneData, setSampleData, setSpecie);
     }, [] );
 
     const handleClick = () => {
         // Check that gene was selected
+        if (genes.length===0){
+            setGeneError(true);
+            return;
+        }
+
         // Blow up parameters and route
+        navigate(`/${mode}`, { state: { mode, genes, samples, specie } });
         console.log('Click!!');
     }
 
@@ -59,13 +44,17 @@ function SetParams() {
             <>
                 <ModeSelector mode={mode} setMode={setMode}/>
                 <ProteinForm 
-                    specie={specie}
                     setSpecie={setSpecie}
                     setSamples={setSamples}
                     setGenes={setGenes}
                     species={Object.keys(sampleData)} 
                     geneData={geneData}
                     sampleData={sampleData}
+                    geneError={geneError}
+                    setGeneError={setGeneError}
+                    defaultGenes={[]}
+                    defaultSamples={[]}
+                    //defaultSpecie={specie}
                 />
                 <div className='mt-5' style={{textAlign:'center'}}>
                     <Button variant="contained" endIcon={<SendIcon />} color='info' size='large' onClick={handleClick}>

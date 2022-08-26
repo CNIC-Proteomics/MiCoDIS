@@ -1,43 +1,27 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
-import styled from 'styled-components';
 
 import Autocomplete, { createFilterOptions } from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-//import Autocomplete from './mui/Autocomplete';
-//import SelectMui from './mui/SelectMui';
 import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 
+// Constants
+const specie2Name = {
+    'mus_musculus': 'Mouse'
+};
 
-//import styled from 'styled-components';
 
 function ProteinForm(props) {
-    const specie = props.specie;
-    const setSpecie = props.setSpecie;
-    const setSamples = props.setSamples;
-    const setGenes = props.setGenes;
 
-    //const [specie, setSpecie] = useState(props.species[0]);
-    //const [samples, setSamples] = useState([]);
-    //const [genes, setGenes] = useState([]);
-    const [sampleOptions, setSampleOptions] = useState([]);
-    const [geneOptions, setGeneOptions] = useState([]);
-
-
+    const [specie, setSpecie] = useState(props.species[0]);
+    const [sampleOptions, setSampleOptions] = useState();
+    const [geneOptions, setGeneOptions] = useState();
+    //const [inputDefault, setInputDefault] = useState([true]);
 
     const handleSpecie = (e) => {
         setSpecie(e.target.value);
+        props.setSpecie(e.target.value);
         console.log(e.target.value);
-    }
-
-    const handleSample = (value) => {
-        setSamples(value.map((e) => e.title));
-        console.log(value.map((e) => e.title));
-    }
-
-    const handleGene = (value) => {
-        setGenes(value.map((e) => e.title));
-        console.log(value.map((e) => e.title));
     }
 
     useEffect( () => {
@@ -51,6 +35,9 @@ function ProteinForm(props) {
 
 
   return (
+    <>
+    {
+    geneOptions && sampleOptions &&
     <div className='mt-5'>
 
         <div style={{textAlign:'center'}}>
@@ -65,7 +52,7 @@ function ProteinForm(props) {
                         label='Specie'
                         onChange={handleSpecie}
                     >
-                        <MenuItem value='mus_musculus'>Mouse</MenuItem>
+                        {props.species.map( e => <MenuItem key={e} value={e}>{specie2Name[e]}</MenuItem> )}
                     </Select>
                 </FormControl>
             </Box>
@@ -75,13 +62,13 @@ function ProteinForm(props) {
             <div style={{ width: '40%', textAlign:'center'}}> 
                 <Autocomplete
                     style={{margin:'auto'}}
-                    onChange={(e,value)=>handleSample(value)}
+                    onChange={(e,value)=> props.setSamples(value.map(v=>v.title)) }
                     multiple
                     //limitTags={2}
-                    id="multiple-limit-tags"
+                    id="multiple-limit-tags-sample"
                     options={sampleOptions}
                     getOptionLabel={(option) => option.title}
-                    //defaultValue={[{title:'Brain'}]}
+                    defaultValue = {sampleOptions.filter( e => props.defaultSamples.includes(e.title) )}
                     renderInput={(params) => (
                         <TextField {...params} label="Samples" placeholder="enter sample" />
                     )}
@@ -91,15 +78,21 @@ function ProteinForm(props) {
             <div style={{ width: '40%', textAlign:'center'}}> 
                 <Autocomplete
                     style={{margin:'auto'}}
-                    onChange={(e,value)=>handleGene(value)}
+                    onChange={(e,value)=> props.setGenes(value.map(v=>v.title)) }
                     multiple
                     //limitTags={2}
-                    id="multiple-limit-tags"
+                    id="multiple-limit-tags-gene"
                     options={geneOptions}
                     getOptionLabel={(option) => option.title}
-                    //defaultValue={[{title:'Brain'}]}
+                    defaultValue = {geneOptions.filter( e => props.defaultGenes.includes(e.title) )}
                     renderInput={(params) => (
-                        <TextField {...params} label="Genes" placeholder="enter gene" />
+                        <TextField 
+                            {...params} 
+                            label="Genes" 
+                            placeholder="enter gene"
+                            error={props.geneError ? true : false}
+                            onChange={ () => props.setGeneError(false) }
+                        />
                     )}
                     sx={{ width: '70%' }}
                     filterOptions={createFilterOptions({matchFrom: 'any', limit:100})}
@@ -108,15 +101,12 @@ function ProteinForm(props) {
             </div>
         </div>
 
-    </div>
+        {props.children}
 
+    </div>
+    }
+    </>
     )
 }
-
-const Title = styled.h1`
-    font-size:1.5rem;
-    color:rgba(0,0,0,0.6);
-    text-align:center
-`
 
 export default ProteinForm

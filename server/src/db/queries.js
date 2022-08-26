@@ -91,7 +91,7 @@ async function getPairWiseCorrelations(gene, specie, tissue) {
             for (let k=0; k<tissue.length; k++) {
                 tk = tissue[k];
                 let ft_fg_fs_qcorr = fg_fs_qcorr.filter( e => tk.toLowerCase() == e.tissue.toLowerCase() );
-                corr[si][gj][tk] = ft_fg_fs_qcorr.map( e => { return { PSMs: e.PSMs, score: e.score } } );
+                corr[si][gj][tk] = ft_fg_fs_qcorr.map( e => { return { PSMs: e.PSMs, score: e.score } } )[0];
             }
         }
     }
