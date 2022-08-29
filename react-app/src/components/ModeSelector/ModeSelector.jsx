@@ -7,11 +7,8 @@ import FieldMode from './FieldMode'
 
 function ModeSelector(props) {
 
-    const mode = props.mode;
-    const setMode = props.setMode;
-
     const handleClick = (e) => {
-        setMode(e.currentTarget.id);
+        props.setMode(e.currentTarget.id);
     }
 
   return (
@@ -25,24 +22,15 @@ function ModeSelector(props) {
                 id='correlations'
                 name='Correlations'
                 handleClick={handleClick} 
-                mode={mode}
+                mode={props.mode}
             ><FcScatterPlot size="140"/></FieldMode>
 
             <FieldMode 
-                id='expression' 
+                id='expressions' 
                 name='Expression Pattern'
                 handleClick={handleClick} 
-                mode={mode}
+                mode={props.mode}
             ><GiHistogram size="140"/></FieldMode>
-
-            {/* 
-            <FieldMode 
-                id='set' 
-                name='Set Intersect'
-                handleClick={handleClick} 
-                mode={mode}
-            ><BsIntersect size="140"/></FieldMode>
-            */}
 
         </div>
     </div>

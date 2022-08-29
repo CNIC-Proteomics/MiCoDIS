@@ -92,6 +92,7 @@ function ProteinForm(props) {
                             placeholder="enter gene"
                             error={props.geneError ? true : false}
                             onChange={ () => props.setGeneError(false) }
+                            onClick={ () => props.setGeneError(false) }
                         />
                     )}
                     sx={{ width: '70%' }}

@@ -1,24 +1,25 @@
 import { Button } from '@mui/material';
 import React from 'react'
 import { useEffect, useState } from 'react';
-import ModeSelector from '../components/ModeSelector/ModeSelector'
-import ProteinForm from '../components/ModeSelector/ProteinForm'
 import SendIcon from '@mui/icons-material/Send';
 import { useNavigate } from 'react-router-dom';
+
+import ModeSelector from '../components/ModeSelector/ModeSelector'
+import ProteinForm from '../components/ModeSelector/ProteinForm'
 
 import getData from '../lib/getData';
 
 function SetParams() {
 
-    const [geneData, setGeneData] = useState();
-    const [sampleData, setSampleData] = useState();
+    const [ geneData, setGeneData ] = useState(); // genes of each organism
+    const [ sampleData, setSampleData ] = useState(); // tissues of each organism
 
     const [ mode, setMode ] = useState('correlations');
-    const [specie, setSpecie] = useState();
-    const [samples, setSamples] = useState([]);
-    const [genes, setGenes] = useState([]);
+    const [ specie, setSpecie ] = useState();
+    const [ samples, setSamples ] = useState([]);
+    const [ genes, setGenes ] = useState([]);
 
-    const [geneError, setGeneError] = useState(false);
+    const [ geneError, setGeneError ] = useState(false);
     const navigate = useNavigate();
 
     useEffect( () => {
