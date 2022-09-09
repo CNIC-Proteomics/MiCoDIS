@@ -1,6 +1,14 @@
-import { DataGrid } from '@mui/x-data-grid'
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid'
 import React from 'react'
 import UpSetDiagram from './UpSetDiagram.jsx'
+
+function CustomToolbar() {
+    return (
+      <GridToolbarContainer>
+        <GridToolbarExport printOptions={{ disableToolbarButton: true }} />
+      </GridToolbarContainer>
+    );
+  }
 
 function UpSetSection(props) {
     return (
@@ -26,6 +34,7 @@ function UpSetSection(props) {
                                 align: 'center'
                             }
                         ]}
+                        components={{ Toolbar: CustomToolbar }}
                     />
                 </div>
             }

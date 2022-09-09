@@ -5,6 +5,8 @@ const path = require('path');
 // Import locals
 const myModels = require(path.join(__dirname, '../db/models.js'));
 const myQueries = require(path.join(__dirname, '../db/queries.js'));
+const formatCorrelations = require(path.join(__dirname, 'lib/formatCorrelations.js'));
+const MultiGeneCorrelations = require('./lib/MultiGeneCorrelations');
 
 // Constants
 const router = express.Router();
@@ -57,26 +59,6 @@ router.get('/samples', async (req, res, next) => {
 });
 
 /*
-Retrieve the complexes based on a list of species (Still not defined)
-*/
-/*
-router.get('/complexes', function (req, res, next) {
-    // get queries
-    let params = req.query;
-    // return all complexes from several species
-    if ( 'species' in params ) {
-        let p = params.species.split(/[, ]+/).filter(Boolean); // split by ',' discarding the spaces between them
-        let compls = core.getComplexes(p);
-        res.send(compls);
-    }
-    else {
-        // Sending 404 when not found something
-        res.status(404).send('Complexes not found');
-    }
-});
-*/
-
-/*
 Get correlations from gene
 */
 router.get('/correlations', async (req, res, next) => {
@@ -90,12 +72,25 @@ router.get('/correlations', async (req, res, next) => {
     let t = 'tissue' in params && params.tissue!='' ? params.tissue.split(/[, ]+/).filter(Boolean) : 
         [].concat.apply([], Object.values(await myQueries.getSamples(s)));;
     
-    if ( g.length > 0 ) {
-        let correlations = await myQueries.getPairWiseCorrelations(g, s, t);
+    if ( g.length == 1 ) {
+        let qcorr = await myQueries.getPairWiseCorrelations(g, s, t);
+        let correlations = await formatCorrelations(g, s, t, qcorr);
         res.send(correlations);
-    }   
+    }
+    else if ( g.length > 1 ) {
+        let qcorr = await myQueries.getPairWiseMultiCorrelations(g, s, t);
+        let missingT = t.filter( e => !qcorr.map( f => f.tissue ).includes(e) );
+        if ( missingT.length > 0 ) {
+            let missingQcorr = await MultiGeneCorrelations(g, s, missingT);
+            myQueries.insertMultiCorrelations(missingQcorr);
+            qcorr = qcorr.concat(missingQcorr);
+        }
+        let correlations = await formatCorrelations([g.sort().join('&')], s, t, qcorr);
+        res.send(correlations);
+        
+    }
     else {
-        res.status(404).send({message: 'gene not found query'});
+        res.status(404).send({message: 'gene not found in query'});
     }
     
 });
@@ -107,7 +102,7 @@ router.get('/scounts', async (req, res, next) => {
     let params = req.query;
     
     let g = 'gene' in params ? params.gene.split(/[, ]+/).filter(Boolean) : []; // split by ',' discarding the spaces between them
-    if ( g.length>0 ) {
+    if ( g.length>=0 ) {
         let s = 'specie' in params ? params.specie.split(/[, ]+/).filter(Boolean) : 
             await myQueries.getSpecies();
         

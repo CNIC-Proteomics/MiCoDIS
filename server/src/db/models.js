@@ -24,14 +24,26 @@ correlationsSchema = new Schema({
     gene: String,
     tissue: String,
     organism: String,
-    PSMs: Array,
-    score: Array
+    values: Object
 });
 
 correlations = model('correlations', correlationsSchema);
 
+/*
+multi_correlations
+*/
+multi_correlationsSchema = new Schema({
+    gene: String,
+    tissue: String,
+    organism: String,
+    values: Object
+});
+
+multi_correlations = model('multi_correlations', multi_correlationsSchema);
+
 // Export models
 module.exports = {
     'qbands': qbands,
-    'correlations': correlations
+    'correlations': correlations,
+    'multi_correlations': multi_correlations
 };

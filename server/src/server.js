@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const app = express();
 const port = 5000;
 const baseRoute = '/api';
+process.env.PYTHON = 'python';
 
 app.use(cors());
 

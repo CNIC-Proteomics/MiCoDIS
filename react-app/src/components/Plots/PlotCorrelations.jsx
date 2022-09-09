@@ -18,31 +18,51 @@ function PlotCorrelations(props) {
     //const [correlations, setCorrelations] = useState();
     const [columns, setColumns] = useState([{width:200, label:'Gene', dataKey:'Gene'}]);
 
+    /*
     const correlations = props.correlations;
-    
+    const pval = props.pval;
     const genes = props.genes;
+    */
 
     useEffect( () => {
-        let specie = Object.keys(correlations);
-        let mainGene = Object.keys(correlations[specie]);
-        let samples = Object.keys(correlations[specie][mainGene]).filter( e => correlations[specie][mainGene][e].length!==0 );
+        let specie = Object.keys(props.correlations);
+        let mainGene = Object.keys(props.correlations[specie]);
+        let samples = Object.keys(props.correlations[specie][mainGene]).filter( e => props.correlations[specie][mainGene][e].length!==0 );
         //console.log(samples);
         //console.log(correlations);
         let tablePSM = [];
         let tableScore = [];
         let upSetPSM = [];
         let upSetScore = [];
-        for (let i=0; i<genes.length; i++) {
-            let rowP = {id: genes[i]};
-            let rowS = {id: genes[i]};
-            let upSetElemP = {name:genes[i], sets:[]} // name: name of the gene ; sets
-            let upSetElemS = {name:genes[i], sets:[]} // name: name of the gene ; sets
+
+        for (let i=0; i<props.genes.length; i++) {
+            let rowP = {id: props.genes[i]};
+            let rowS = {id: props.genes[i]};
+            let upSetElemP = {name:props.genes[i], sets:[]} // name: name of the gene ; sets
+            let upSetElemS = {name:props.genes[i], sets:[]} // name: name of the gene ; sets
             let includedP = false;
             let includedS = false;
             for (let j=0; j<samples.length; j++) {
-                
                 rowP[samples[j]] = null;
-                if (correlations[specie][mainGene][samples[j]].PSMs[0][genes[i]]) {
+                rowS[samples[j]] = null;
+
+                let values = props.correlations[specie][mainGene][samples[j]].values[props.genes[i]]
+                if (values) {
+                    if (values[2] && values[2] <= props.pval) { // PSMs
+                        rowP[samples[j]] = values[0];
+                        upSetElemP.sets.push(samples[j]);
+                        includedP = true;
+                    }
+                    if (values[3] && values[3] <= props.pval) { // Score
+                        rowS[samples[j]] = values[1];
+                        upSetElemS.sets.push(samples[j]);
+                        includedS = true;
+                    }
+                }
+
+                /*
+                rowP[samples[j]] = null;
+                if (props.correlations[specie][mainGene][samples[j]].PSMs[0][genes[i]]) {
                     rowP[samples[j]] = parseFloat(correlations[specie][mainGene][samples[j]].PSMs[0][genes[i]]).toFixed(4);
                     upSetElemP.sets.push(samples[j]);
                     includedP = true;
@@ -54,6 +74,7 @@ function PlotCorrelations(props) {
                     upSetElemS.sets.push(samples[j]);
                     includedS = true;
                 }
+                */
 
             }
 
@@ -76,7 +97,7 @@ function PlotCorrelations(props) {
         setColumns(cols);
         setUpSetGenesPSMs({name:'', elems:[]});
         setUpSetGenesScore({name:'', elems:[]});
-    }, [correlations] )
+    }, [props] )
 
   return (
     <div>

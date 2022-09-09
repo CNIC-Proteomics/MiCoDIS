@@ -32,7 +32,7 @@ function UpSetPlot(props) {
         
     const f1 = (x) => {
         console.log(x);
-        props.setUpSetGenes({ elems: x.elems.map(e => ({ id: e.name })), name: x.name });
+        if (x) props.setUpSetGenes({ elems: x.elems.map(e => ({ id: e.name })), name: x.name });
     };
 
     return (

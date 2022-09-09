@@ -19,18 +19,18 @@ function ModeSelector(props) {
         <div className="d-flex justify-content-around mt-4">
 
             <FieldMode 
-                id='correlations'
-                name='Correlations'
-                handleClick={handleClick} 
-                mode={props.mode}
-            ><FcScatterPlot size="140"/></FieldMode>
-
-            <FieldMode 
                 id='expressions' 
                 name='Expression Pattern'
                 handleClick={handleClick} 
                 mode={props.mode}
             ><GiHistogram size="140"/></FieldMode>
+
+            <FieldMode 
+                id='correlations'
+                name='Correlations'
+                handleClick={handleClick} 
+                mode={props.mode}
+            ><FcScatterPlot size="140"/></FieldMode>
 
         </div>
     </div>

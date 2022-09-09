@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, TextField } from '@mui/material';
 import React from 'react'
 import { useEffect, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
@@ -6,25 +6,25 @@ import { useNavigate } from 'react-router-dom';
 
 import ModeSelector from '../components/ModeSelector/ModeSelector'
 import ProteinForm from '../components/ModeSelector/ProteinForm'
+import PvalueSelector from '../components/PvalueSelector';
 
-import getData from '../lib/getData';
+// import getData from '../lib/getData';
 
 function SetParams() {
 
-    const [ geneData, setGeneData ] = useState(); // genes of each organism
-    const [ sampleData, setSampleData ] = useState(); // tissues of each organism
+    const geneData = require('../data/genes.json');
+    const sampleData = require('../data/samples.json');
+    const c2g = require('../data/c2g.json');
+    const classOptions = Object.keys(c2g).map( e => ({ title: e, type: 'Class' }) );
 
     const [ mode, setMode ] = useState('correlations');
-    const [ specie, setSpecie ] = useState();
+    const [ specie, setSpecie ] = useState(Object.keys(sampleData)[0]);
     const [ samples, setSamples ] = useState([]);
     const [ genes, setGenes ] = useState([]);
+    const [pval, setPval ] = useState(0.05);
 
     const [ geneError, setGeneError ] = useState(false);
     const navigate = useNavigate();
-
-    useEffect( () => {
-        getData(setGeneData, setSampleData, setSpecie);
-    }, [] );
 
     const handleClick = () => {
         // Check that gene was selected
@@ -33,8 +33,14 @@ function SetParams() {
             return;
         }
 
+        let allGenes = genes.filter( e => !Object.keys(c2g).includes(e) );
+        let classes = genes.filter( e => Object.keys(c2g).includes(e) );
+        let classesGenes = classes.map( e => c2g[e].Gene ).flat();
+        allGenes = allGenes.concat(classesGenes);
+
         // Blow up parameters and route
-        navigate(`/${mode}`, { state: { mode, genes, samples, specie } });
+        navigate(`/${mode}`, { state: { mode, genes: allGenes, samples, specie, pval, defaultGenes:genes } });
+        console.log({ mode, genes, samples, specie, pval });
         console.log('Click!!');
     }
 
@@ -56,7 +62,12 @@ function SetParams() {
                     defaultGenes={[]}
                     defaultSamples={[]}
                     //defaultSpecie={specie}
+                    mode={mode}
+                    pval={pval}
+                    setPval={setPval}
+                    classOptions={classOptions}
                 />
+
                 <div className='mt-5' style={{textAlign:'center'}}>
                     <Button variant="contained" endIcon={<SendIcon />} color='info' size='large' onClick={handleClick}>
                         Search

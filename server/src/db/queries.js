@@ -75,41 +75,61 @@ async function getPairWiseCorrelations(gene, specie, tissue) {
             {$or: specie.map( e => { return { organism: new RegExp(`^${e}$`, 'i') } } )},
             {$or: tissue.map( e => { return { tissue: new RegExp(`^${e}$`, 'i') } } )},
         ]
-    }, 'gene organism tissue PSMs score');
+    }, 'gene organism tissue values');// PSMs_pvalue score_pvalue');
     let qcorr = await query;
     qcorr = qcorr.map( e => e.toObject() );
+    return qcorr;
+}
 
-    let corr = {};
-    for (let i=0; i<specie.length; i++) {
-        let si = specie[i];
-        corr[si] = {};
-        let fs_qcorr = qcorr.filter( e => si.toLowerCase() == e.organism.toLowerCase() );
-        for (let j=0; j<gene.length; j++) {
-            gj = gene[j];
-            corr[si][gj] = {};
-            let fg_fs_qcorr = fs_qcorr.filter( e => gj.toLowerCase() == e.gene.toLowerCase() );
-            for (let k=0; k<tissue.length; k++) {
-                tk = tissue[k];
-                let ft_fg_fs_qcorr = fg_fs_qcorr.filter( e => tk.toLowerCase() == e.tissue.toLowerCase() );
-                corr[si][gj][tk] = ft_fg_fs_qcorr.map( e => { return { PSMs: e.PSMs, score: e.score } } )[0];
-            }
+/*
+Get multi_correlations
+*/
+async function getPairWiseMultiCorrelations(gene, specie, tissue) {
+    let query = myModels.multi_correlations.find({
+        $and: [
+            {$and: [
+            { gene: gene.sort().join('&') },
+            //{ $or: gene.map( e => { return { gene: new RegExp(`^${e}$`, 'i') } } ) },
+            { $or: specie.map( e => { return { organism: new RegExp(`^${e}$`, 'i') } } ) },
+            { $or: tissue.map( e => { return { tissue: new RegExp(`^${e}$`, 'i') } } ) },
+            ] }
+        ]
+    }, 'gene organism tissue values');// PSMs_pvalue score_pvalue');
+    let qcorr = await query;
+    qcorr = qcorr.map( e => e.toObject() );
+    return qcorr;
+}
+
+
+/*
+Insert multi_correlations
+*/
+function insertMultiCorrelations(qcorr) {
+    myModels.multi_correlations.insertMany(qcorr, (err) => {
+        if (err) {
+            console.error(err);
+        } 
+        else {
+            qcorr.map(
+                e => console.log(`Insert multi_correlations: {gene:${e.gene}, tissue:${e.tissue}, specie:${e.organism}}`) 
+            );
         }
-    }
-
-    return corr;
-};
+    })
+}
 
 /*
 Get counts
 */
 async function getSCounts(g, s, t) {
+    
     let query = myModels.qbands.find({
         $and: [
-            { $or: g.map( e => { return { gene: new RegExp(`^${e}$`, 'i') } } ) },
-            { $or: s.map( e => { return { organism: new RegExp(`^${e}$`, 'i') } } ) },
-            { $or: t.map( e => { return { tissue: new RegExp(`^${e}$`, 'i') } } ) }
+            { $or: g.length>0 ? g.map( e => ({ gene: e })  ) : [{}] },
+            { $or: s.map( e => ({ organism: e }) ) },
+            { $or: t.map( e => ({ tissue: e }) ) }
         ]
     }, 'organism tissue gene bands PSMs score');
+
     let qscounts = await query;
     qscounts = qscounts.map( e => e.toObject() );
 
@@ -121,15 +141,16 @@ async function getSCounts(g, s, t) {
 
         for (let j=0; j<t.length; j++) {
             let tj = t[j];
-            scounts[si][tj] = {}
-            let ft_fs_qscounts = fs_qscounts.filter( e => e.tissue.toLowerCase() == tj.toLowerCase() )
+            let ft_fs_qscounts = fs_qscounts.filter( e => e.tissue.toLowerCase() == tj.toLowerCase() );
+            scounts[si][tj] = {};
 
-            for (let k=0; k<g.length; k++) {
-                let gk = g[k];
-                let fg_ft_fs_qscounts = ft_fs_qscounts.filter( e => gk.toLowerCase() == e.gene.toLowerCase() );
-                scounts[si][tj][gk] = fg_ft_fs_qscounts.map( e => { return { bands: e.bands, PSMs: e.PSMs, score: e.score } } );
+            for (let k=0; k<ft_fs_qscounts.length; k++) {
+                scounts[si][tj][ft_fs_qscounts[k].gene] = {
+                    bands: ft_fs_qscounts[k].bands,
+                    score: ft_fs_qscounts[k].score,
+                    PSMs: ft_fs_qscounts[k].PSMs
+                }
             }
-
         }
     }
     
@@ -142,5 +163,7 @@ module.exports = {
     getProteins: getProteins,
     getSamples: getSamples,
     getPairWiseCorrelations: getPairWiseCorrelations,
+    getPairWiseMultiCorrelations: getPairWiseMultiCorrelations,
+    insertMultiCorrelations: insertMultiCorrelations,
     getSCounts: getSCounts
 };

@@ -1,0 +1,14 @@
+14588 - 09/09/2022 12:27:57 PM - INFO - START MAIN: S:\U_Proteomica\UNIDAD\software\MacrosRafa\data\Proteomics\GroupTools\MiCoDIS\server\src\cmds\MultiGeneCorrelation.py -i src\db -sp mus_musculus -g 1700014D04Rik Cox7a1 -s Heart
+14588 - 09/09/2022 12:28:00 PM - INFO - END MAIN
+7508 - 09/09/2022 12:28:36 PM - INFO - START MAIN: S:\U_Proteomica\UNIDAD\software\MacrosRafa\data\Proteomics\GroupTools\MiCoDIS\server\src\cmds\MultiGeneCorrelation.py -i src\dbb -sp mus_musculus -g 1700007B14Rik 1700014D04Rik Cox7a1 -s Heart
+7508 - 09/09/2022 12:28:36 PM - ERROR - Error reading input files
+Traceback (most recent call last):
+  File "S:\U_Proteomica\UNIDAD\software\MacrosRafa\data\Proteomics\GroupTools\MiCoDIS\server\src\cmds\MultiGeneCorrelation.py", line 36, in main
+    data = pd.read_feather(os.path.join(args.i, args.sp, 'gene_count_score.feather'))
+  File "C:\Users\rbarreror\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\feather_format.py", line 128, in read_feather
+    with get_handle(
+  File "C:\Users\rbarreror\AppData\Local\Programs\Python\Python310\lib\site-packages\pandas\io\common.py", line 798, in get_handle
+    handle = open(handle, ioargs.mode)
+FileNotFoundError: [Errno 2] No such file or directory: 'src\\dbb\\mus_musculus\\gene_count_score.feather'
+27212 - 09/09/2022 12:30:59 PM - INFO - START MAIN: S:\U_Proteomica\UNIDAD\software\MacrosRafa\data\Proteomics\GroupTools\MiCoDIS\server\src\cmds\MultiGeneCorrelation.py -i src\db -sp mus_musculus -g 1700007B14Rik 1700014D04Rik Bad Bak1 Bax Bcl2l13 Bid Casp8 Cox7a1 Diablo Dnaja3 Fastk Fastkd2 Fkbp8 Htra2 -s Heart
+27212 - 09/09/2022 12:31:02 PM - INFO - END MAIN
